@@ -4,7 +4,7 @@ as
 set nocount on
 begin
 	declare @RowCount int = (select count(*) from syn.SA_CustomerSeasonal)
-	declare @ErrorMessage varchar(max)
+	declare @ErrorMessage varchar(max)                               #1. При объявлении разных переменных declare необходимо использовать запятую и писать с новой строки.#
 
 -- Проверка на корректность загрузки
 	if not exists (
@@ -20,11 +20,11 @@ begin
 			return
 		end
 
-	CREATE TABLE #ProcessedRows(ActionType varchar(255), ID int)
+	CREATE TABLE #ProcessedRows(ActionType varchar(255), ID int)                #2. Пустая строка после CREATE TABLE.#
 	
 	--Чтение из слоя временных данных
 	select
-		cc.ID as ID_dbo_Customer
+		cc.ID as ID_dbo_Customer                                   #3. Запятые ставятся в конце строки и каждая новая переменная начинается с новой строки.#
 		,cst.ID as ID_CustomerSystemType
 		,s.ID as ID_Season
 		,cast(sa.DateBegin as date) as DateBegin
@@ -32,13 +32,13 @@ begin
 		,cd.ID as ID_dbo_CustomerDistributor
 		,cast(isnull(sa.FlagActive, 0) as bit) as FlagActive
 	into #CustomerSeasonal
-	from syn.SA_CustomerSeasonal cs
+	from syn.SA_CustomerSeasonal cs                                          #4. Между syn.SA_CustomerSeasonal и cs  пропещено as.#
 		join dbo.Customer as cc on cc.UID_DS = sa.UID_DS_Customer
 			and cc.ID_mapping_DataSource = 1
 		join dbo.Season as s on s.Name = sa.Season
 		join dbo.Customer as cd on cd.UID_DS = sa.UID_DS_CustomerDistributor
 			and cd.ID_mapping_DataSource = 1
-		join syn.CustomerSystemType as cst on sa.CustomerSystemType = cst.Name
+		join syn.CustomerSystemType as cst on sa.CustomerSystemType = cst.Name             #5. Первым делом необходимо указывать поле присроединяемой таблицы.#
 	where try_cast(sa.DateBegin as date) is not null
 		and try_cast(sa.DateEnd as date) is not null
 		and try_cast(isnull(sa.FlagActive, 0) as bit) is not null
@@ -46,7 +46,7 @@ begin
 	-- Определяем некорректные записи
 	-- Добавляем причину, по которой запись считается некорректной
 	select
-		sa.*
+		sa.*                                                             #6. Запятая находится не на своем месте, необходимо ее перенести после знака *.#
 		,case
 			when cc.ID is null then 'UID клиента отсутствует в справочнике "Клиент"'
 			when cd.ID is null then 'UID дистрибьютора отсутствует в справочнике "Клиент"'
