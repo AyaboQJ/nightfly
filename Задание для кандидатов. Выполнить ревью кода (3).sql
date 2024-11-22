@@ -46,7 +46,7 @@ begin
 	-- Определяем некорректные записи
 	-- Добавляем причину, по которой запись считается некорректной
 	select
-		cs.*
+		cs.*                                                      #7. Запятая находится не на своем месте, необходимо ее перенести после знака *.#
 		,case
 			when c.ID is null then 'UID клиента отсутствует в справочнике "Клиент"'
 			when c_dist.ID is null then 'UID дистрибьютора отсутствует в справочнике "Клиент"'
@@ -82,7 +82,7 @@ begin
 			,cs_temp.DateEnd
 			,cs_temp.ID_dbo_CustomerDistributor
 			,cs_temp.FlagActive
-		from #CustomerSeasonal as cs_temp
+		from #CustomerSeasonal as cs_temp                           
 	) as s on s.ID_dbo_Customer = cs.ID_dbo_Customer
 		and s.ID_Season = cs.ID_Season
 		and s.DateBegin = cs.DateBegin
@@ -96,7 +96,7 @@ begin
 			,FlagActive = s.FlagActive
 	when not matched then
 		insert (ID_dbo_Customer, ID_CustomerSystemType, ID_Season, DateBegin, DateEnd, ID_dbo_CustomerDistributor, FlagActive)
-		values (s.ID_dbo_Customer, s.ID_CustomerSystemType, s.ID_Season, s.DateBegin, s.DateEnd, s.ID_dbo_CustomerDistributor, s.FlagActive)
+		values (s.ID_dbo_Customer, s.ID_CustomerSystemType, s.ID_Season, s.DateBegin, s.DateEnd, s.ID_dbo_CustomerDistributor, s.FlagActive)            #8. ; следует ставить на строке где заканчивается расчет, а не на следующей. #
 	;
 
 	-- Информационное сообщение
