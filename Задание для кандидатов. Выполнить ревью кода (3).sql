@@ -4,7 +4,7 @@ AS
 set nocount on
 begin
 	declare @RowCount int = (select count(*) from syn.SA_CustomerSeasonal)
-	declare @ErrorMessage varchar(max)
+	declare @ErrorMessage varchar(max)                                           #1. При объявлении разных переменных declare необходимо использовать запятую и писать с новой строки.#
 
 -- Проверка на корректность загрузки
 	if not exists (
@@ -22,19 +22,21 @@ begin
 
 	--Чтение из слоя временных данных
 	select
-		c.ID as ID_dbo_Customer
+		c.ID as ID_dbo_Customer                   #2. Запятые ставятся в конце строки и каждая новая переменная начинается с новой строки.#
 		,cst.ID as ID_CustomerSystemType
+		,cst.ID as ID_CustomerSystemType              #3. Две повторяющихся записи cst.ID as ID_CustomerSystemType. #
 		,s.ID as ID_Season
 		,cast(cs.DateBegin as date) as DateBegin
 		,cast(cs.DateEnd as date) as DateEnd
-		,c_dist.ID as ID_dbo_CustomerDistributor
+		,c_dist.ID as ID_dbo_CustomerDistributor             #4. Вместо c_dist.ID нужно cd.ID. #
 		,cast(isnull(cs.FlagActive, 0) as bit) as FlagActive
 	into #CustomerSeasonal
-	from syn.SA_CustomerSeasonal cs
+	from syn.SA_CustomerSeasonal cs                                       #5. Между syn.SA_CustomerSeasonal и cs  пропещено as.#
 		join dbo.Customer as c on c.UID_DS = cs.UID_DS_Customer
 			and c.ID_mapping_DataSource = 1
 		join dbo.Season as s on s.Name = cs.Season
-		join dbo.Customer as c_dist on c_dist.UID_DS = cs.UID_DS_CustomerDistributor
+		join dbo.Customer as c_dist on c_dist.UID_DS = cs.UID_DS_CustomerDistributor             #6. Первым делом необходимо указывать поле присроединяемой таблицы.#
+	where try_cast(sa.DateBegin as date) is not null
 			and cd.ID_mapping_DataSource = 1
 		join syn.CustomerSystemType as cst on cs.CustomerSystemType = cst.Name
 	where try_cast(cs.DateBegin as date) is not null
